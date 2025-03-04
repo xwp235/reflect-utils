@@ -1,12 +1,12 @@
 package jp.onehr.reflect.clazz;
 
 import jp.onehr.reflect.asserts.Assert;
+import jp.onehr.reflect.enums.BasicTypeEnum;
 import jp.onehr.reflect.text.CharPool;
+import jp.onehr.reflect.text.StringUtils;
 
 import java.io.File;
 import java.lang.reflect.Array;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ public class ClassLoaderUtils {
     /**
      * 包名分界符: '.'
      */
-    private static final char PACKAGE_SEPARATOR = StrUtil.C_DOT;
+    private static final char PACKAGE_SEPARATOR = StringUtils.C_DOT;
     /**
      * 内部类分界符: '$'
      */
@@ -49,7 +49,7 @@ public class ClassLoaderUtils {
     static {
         final List<Class<?>> primitiveTypes = new ArrayList<>(32);
         // 加入原始类型
-        primitiveTypes.addAll(BasicType.PRIMITIVE_WRAPPER_MAP.keySet());
+        primitiveTypes.addAll(BasicTypeEnum.PRIMITIVE_WRAPPER_MAP.keySet());
         // 加入原始类型数组类型
         primitiveTypes.add(boolean[].class);
         primitiveTypes.add(byte[].class);
@@ -72,13 +72,7 @@ public class ClassLoaderUtils {
      * @see Thread#getContextClassLoader()
      */
     public static ClassLoader getContextClassLoader() {
-        if (System.getSecurityManager() == null) {
-            return Thread.currentThread().getContextClassLoader();
-        } else {
-            // 绕开权限检查
-            return AccessController.doPrivileged(
-                    (PrivilegedAction<ClassLoader>) () -> Thread.currentThread().getContextClassLoader());
-        }
+        return Thread.currentThread().getContextClassLoader();
     }
 
     /**
@@ -89,13 +83,7 @@ public class ClassLoaderUtils {
      * @since 5.7.0
      */
     public static ClassLoader getSystemClassLoader() {
-        if (System.getSecurityManager() == null) {
-            return ClassLoader.getSystemClassLoader();
-        } else {
-            // 绕开权限检查
-            return AccessController.doPrivileged(
-                    (PrivilegedAction<ClassLoader>) ClassLoader::getSystemClassLoader);
-        }
+        return ClassLoader.getSystemClassLoader();
     }
 
 
@@ -114,7 +102,7 @@ public class ClassLoaderUtils {
     public static ClassLoader getClassLoader() {
         ClassLoader classLoader = getContextClassLoader();
         if (classLoader == null) {
-            classLoader = ClassLoaderUtil.class.getClassLoader();
+            classLoader = ClassLoaderUtils.class.getClassLoader();
             if (null == classLoader) {
                 classLoader = getSystemClassLoader();
             }
@@ -204,7 +192,7 @@ public class ClassLoaderUtils {
      */
     public static Class<?> loadPrimitiveClass(String name) {
         Class<?> result = null;
-        if (StrUtil.isNotBlank(name)) {
+        if (StringUtils.isNotBlank(name)) {
             name = name.trim();
             if (name.length() <= 8) {
                 result = PRIMITIVE_TYPE_NAME_MAP.get(name);
