@@ -1,4 +1,4 @@
-package jp.onehr.reflect;
+package jp.onehr.reflect.reference;
 
 import jp.onehr.reflect.enums.ReferenceEnum;
 
